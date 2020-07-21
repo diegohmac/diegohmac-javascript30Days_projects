@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Speech Detection</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="words" contenteditable></div>
+
+    <script>
+      window.SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      const recognition = new SpeechRecognition();
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      let p = document.createElement("p");
+      const words = document.querySelector(".words");
+      words.appendChild(p);
+
+      recognition.addEventListener("result", (e) => {
+        const transcript = Array.from(e.results)
+          .map((result) => result[0])
+          .map((result) => result.transcript)
+          .join("");
+
+        p.textContent = transcript;
+
+        if (e.results[0].isFinal) {
+          p = document.createElement("p");
+          words.appendChild(p);
+        }
+
+        if (
+          e.results[0].isFinal &&
+          new RegExp("^clear$", "gi").test(transcript)
+        ) {
+          words.innerHTML = "";
+        }
+
+        if (
+          e.results[0].isFinal &&
+          new RegExp("^open google$", "gi").test(transcript)
+        ) {
+          window.open("https://www.google.com.br");
+        }
+      });
+
+      recognition.addEventListener("end", recognition.start);
+
+      recognition.start();
+    </script>
+  </body>
+</html>
